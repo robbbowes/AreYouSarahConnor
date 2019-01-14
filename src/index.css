@@ -1,6 +1,14 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
-  background: linear-gradient(89deg, rgb(255, 182, 240) 0%, rgb(200, 250, 255) 100%)
+  font-family: "Courier New", Courier, monospace;
+  background: linear-gradient(89deg, rgb(201, 182, 197) 0%, rgb(175, 211, 214) 100%)
+}
+
+button {
+  cursor: pointer;
+}
+
+.barcode {
+  font-family: 'Libre Barcode 128 Text', cursive;
 }
