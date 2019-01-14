@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Navigation from './components/Navigation/Navigation';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
-import Rank from './components/Rank/Rank';
+import MissionStatus from './components/MissionStatus/MissionStatus';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
@@ -32,12 +32,21 @@ class App extends Component {
     this.state = {
       input: '',
       imageUrl: '',
-      box: {}
+      box: {},
+      located: false
     }
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const index = this.areYouSarahConnor(data);
+    let clarifaiFace, boxShadow;
+    if (index !== undefined) {
+      clarifaiFace = data.outputs[0].data.regions[index].region_info.bounding_box;
+      boxShadow = 'inset 0 0 0 3px #ff0000';
+    } else {
+      clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+      boxShadow = 'inset 0 0 0 3px #149df2';
+    }
     const image = document.getElementById('faceRecogImg');
     const width = Number(image.width);
     const height = Number(image.height);
@@ -45,8 +54,22 @@ class App extends Component {
       leftCol: clarifaiFace.left_col * width,
       topRow: clarifaiFace.top_row * height,
       rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
+      bottomRow: height - (clarifaiFace.bottom_row * height),
+      boxShadow: boxShadow
     }
+  }
+
+  areYouSarahConnor = (data) => {
+    const concepts = data.outputs[0].data.regions.map(item => item.data.face.identity.concepts);
+    const faces = concepts.map(item => item.map(nested => nested.name));
+    let faceIndex;
+    faces.forEach((item, index) => {
+      if (item.includes('linda hamilton')) {
+        faceIndex = index;
+      }
+    });
+    faceIndex !== undefined ? this.setState({ located: true }) : this.setState({ located: false });
+    return faceIndex;
   }
 
   displayFaceBox = (box) => {
@@ -61,7 +84,8 @@ class App extends Component {
     this.setState({ imageUrl: this.state.input })
     app.models.predict(
       ConfigObj.CELEBRITY_MODEL,
-      this.state.input)
+      this.state.input
+    )
       .then(response => this.displayFaceBox(this.calculateFaceLocation(response))
       .catch(err => console.log(err))
     );
@@ -71,9 +95,15 @@ class App extends Component {
     return (
       <div className="App">
         <Particles className='particles' params={particlesOptions} />
-        <Logo />
-        <Navigation />
-        <Rank />
+        <div className="flex flex-wrap">
+          <div className='tl w-50 pt4'>
+            <Logo />
+          </div>
+          <div className='tr w-50'>
+            <Navigation />
+          </div>
+        </div>
+        <MissionStatus located={this.state.located}/>
         <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
         <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
