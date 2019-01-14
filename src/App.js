@@ -15,7 +15,7 @@ const app = new Clarifai.App({
 
 const particlesOptions = {
   particles: {
-    number : {
+    number: {
       value: 200,
       density: {
         enable: true,
@@ -31,37 +31,51 @@ class App extends Component {
     super();
     this.state = {
       input: '',
+      imageUrl: '',
+      box: {}
     }
+  }
+
+  calculateFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('faceRecogImg');
+    const width = Number(image.width);
+    const height = Number(image.height);
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row * height)
+    }
+  }
+
+  displayFaceBox = (box) => {
+    this.setState({box: box})
   }
 
   onInputChange = (event) => {
-    console.log(event.target.value);
+    this.setState({ input: event.target.value })
   }
 
   onButtonSubmit = () => {
-    console.log('click');
+    this.setState({ imageUrl: this.state.input })
     app.models.predict(
-      ConfigObj.CELEBRITY_MODEL, 
-      "https://o.aolcdn.com/images/dims3/GLOB/crop/1944x1276+0+34/resize/1028x675!/format/jpg/quality/85/http%3A%2F%2Fo.aolcdn.com%2Fhss%2Fstorage%2Fmidas%2Fdf86b0ab14d5d04db8f7448589ccab5c%2F205688650%2Factress-linda-hamilton-attending-the-premiere-of-terminator-2-on-july-picture-id156085440"
-    ).then(
-    function(response) {
-      console.log(response)
-    },
-    function(err) {
-      console.log(err)
-    }
-  );
+      ConfigObj.CELEBRITY_MODEL,
+      this.state.input)
+      .then(response => this.displayFaceBox(this.calculateFaceLocation(response))
+      .catch(err => console.log(err))
+    );
   }
 
   render() {
     return (
       <div className="App">
-        <Particles className='particles' params={particlesOptions}/>
+        <Particles className='particles' params={particlesOptions} />
         <Logo />
         <Navigation />
         <Rank />
         <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
-        <FaceRecognition />
+        <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
     );
   }
