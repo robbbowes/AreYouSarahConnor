@@ -60,6 +60,7 @@ class App extends Component {
   }
 
   areYouSarahConnor = (data) => {
+    this.clearInput();
     const concepts = data.outputs[0].data.regions.map(item => item.data.face.identity.concepts);
     const faces = concepts.map(item => item.map(nested => nested.name));
     let faceIndex;
@@ -72,23 +73,28 @@ class App extends Component {
     return faceIndex;
   }
 
+  clearInput = () => {
+    document.getElementById('url-input').value = '';
+  }
+
   displayFaceBox = (box) => {
-    this.setState({box: box})
+    this.setState({ box: box });
   }
 
   onInputChange = (event) => {
-    this.setState({ input: event.target.value })
+    this.setState({ input: event.target.value });
   }
 
   onButtonSubmit = () => {
-    this.setState({ imageUrl: this.state.input })
+    this.setState({ imageUrl: this.state.input });
+    this.clearInput();
     app.models.predict(
       ConfigObj.CELEBRITY_MODEL,
       this.state.input
     )
       .then(response => this.displayFaceBox(this.calculateFaceLocation(response))
-      .catch(err => console.log(err))
-    );
+        .catch(err => console.log(err))
+      );
   }
 
   render() {
@@ -96,14 +102,16 @@ class App extends Component {
       <div className="App">
         <Particles className='particles' params={particlesOptions} />
         <div className="flex flex-wrap">
-          <div className='tl w-50 pt4'>
+          <div className='tl w-20 pt4'>
             <Logo />
           </div>
-          <div className='tr w-50'>
+          <div className='w-60'>
+          <MissionStatus located={this.state.located} />
+          </div>
+          <div className='tr w-20'>
             <Navigation />
           </div>
         </div>
-        <MissionStatus located={this.state.located}/>
         <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
         <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
