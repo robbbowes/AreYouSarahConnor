@@ -1,8 +1,8 @@
 import React from 'react';
 
-const MissionStatus = ({ located }) => {
+const MissionStatus = ({ location }) => {
 
-    const mission = "MISSION: " + (located === true ? 'TERMINATE TARGET' : 'LOCATE TARGET');
+    const mission = "MISSION: " + (location !== -1 ? 'TERMINATE TARGET' : 'LOCATE TARGET');
 
     return (
         <div>

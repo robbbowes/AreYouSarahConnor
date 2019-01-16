@@ -31,7 +31,7 @@ class App extends Component {
       input: '',
       imageUrl: '',
       box: {},
-      located: false
+      location: -1
     }
   }
 
@@ -46,10 +46,9 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    const index = this.areYouSarahConnor(data);
     let clarifaiFace, boxShadow;
-    if (index !== undefined) {
-      clarifaiFace = data.outputs[0].data.regions[index].region_info.bounding_box;
+    if (this.state.location !== -1) {
+      clarifaiFace = data.outputs[0].data.regions[this.state.location].region_info.bounding_box;
       boxShadow = 'inset 0 0 0 3px #ff0000';
     } else {
       clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
@@ -67,19 +66,21 @@ class App extends Component {
     }
   }
 
-  areYouSarahConnor = (data) => {
-    this.clearInput();
+  getBestGuesses = (data) => {
     const concepts = data.outputs[0].data.regions.map(item => item.data.face.identity.concepts);
-    const faces = concepts.map(item => item.map(nested => nested.name));
-    let faceIndex;
-    faces.forEach((item, index) => {
-      if (item.includes('linda hamilton')) {
-        faceIndex = index;
+    return concepts.map(firstItem => firstItem[0])
+  }
+
+  targetLocator = (facesObjs) => {
+    let location = -1;
+    facesObjs.forEach((face, i) => {
+      if (face.name === 'linda hamilton') {
+        location = i;
       }
     });
-    faceIndex !== undefined ? this.setState({ located: true }) : this.setState({ located: false });
-    return faceIndex;
+    location === -1 ? this.setState({ location: -1 }) : this.setState({ location: location });
   }
+
 
   clearInput = () => {
     document.getElementById('url-input').value = '';
@@ -93,6 +94,12 @@ class App extends Component {
     this.setState({ input: event.target.value });
   }
 
+  onHitEnter = (e) => {
+    if (e.keycode === 13) {
+      this.onButtonSubmit();
+    }
+  }
+
   onButtonSubmit = () => {
     this.scanToggle();
     this.setState({ imageUrl: this.state.input });
@@ -101,9 +108,14 @@ class App extends Component {
       ConfigObj.CELEBRITY_MODEL,
       this.state.input
     )
-      .then(response => this.displayFaceBox(this.calculateFaceLocation(response))
-        .catch(err => console.log(err))
-      );
+      .then(response => {
+        const faces = this.getBestGuesses(response);
+        this.targetLocator(faces);
+        const location = this.calculateFaceLocation(response);
+        this.displayFaceBox(location)
+      .catch(err => console.log(err))
+      }
+    );
   }
 
   render() {
@@ -114,12 +126,12 @@ class App extends Component {
           <div className='tl w-20 pt4'>
           </div>
           <div className=' center w-60'>
-            <MissionStatus located={this.state.located} />
+            <MissionStatus location={this.state.location} />
           </div>
           <div className='tl w-20 pt4'>
           </div>
         </div>
-        <ImageLinkForm className='center' onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+        <ImageLinkForm className='center' onInputChange={this.onInputChange} onHitEnter={this.onHitEnter} onButtonSubmit={this.onButtonSubmit} />
         <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
     );
