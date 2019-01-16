@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Navigation from './components/Navigation/Navigation';
-import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import MissionStatus from './components/MissionStatus/MissionStatus';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
@@ -37,6 +35,16 @@ class App extends Component {
     }
   }
 
+  scanToggle = () => {
+    const scanElements = document.querySelectorAll('#submit-button span');
+    scanElements.forEach((element, i) => {
+      setTimeout( () => {
+        element.classList.remove('letter' + (i + 1));
+      }, 3000)
+      element.classList.add('letter' + (i + 1));
+    })
+  }
+
   calculateFaceLocation = (data) => {
     const index = this.areYouSarahConnor(data);
     let clarifaiFace, boxShadow;
@@ -45,9 +53,9 @@ class App extends Component {
       boxShadow = 'inset 0 0 0 3px #ff0000';
     } else {
       clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-      boxShadow = 'inset 0 0 0 3px #149df2';
+      boxShadow = 'inset 0 0 0 3px #fff';
     }
-    const image = document.getElementById('faceRecogImg');
+    const image = document.getElementById('face-recog-img');
     const width = Number(image.width);
     const height = Number(image.height);
     return {
@@ -86,6 +94,7 @@ class App extends Component {
   }
 
   onButtonSubmit = () => {
+    this.scanToggle();
     this.setState({ imageUrl: this.state.input });
     this.clearInput();
     app.models.predict(
@@ -103,16 +112,14 @@ class App extends Component {
         <Particles className='particles' params={particlesOptions} />
         <div className="flex flex-wrap">
           <div className='tl w-20 pt4'>
-            <Logo />
           </div>
-          <div className='w-60'>
-          <MissionStatus located={this.state.located} />
+          <div className=' center w-60'>
+            <MissionStatus located={this.state.located} />
           </div>
-          <div className='tr w-20'>
-            <Navigation />
+          <div className='tl w-20 pt4'>
           </div>
         </div>
-        <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+        <ImageLinkForm className='center' onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
         <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
     );

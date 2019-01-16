@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Courier New", Courier, monospace;
-  background: linear-gradient(89deg, rgb(201, 182, 197) 0%, rgb(175, 211, 214) 100%)
+  background: linear-gradient(89deg, rgb(245, 76, 76) 0%, rgb(252, 50, 50) 100%)
 }
 
 button {
@@ -16,3 +16,28 @@ button {
 .quantico {
   font-family: 'Quantico', sans-serif;
 }
+
+.letter1  {
+  animation: letterone 1s infinite;
+}
+@keyframes letterone {80% {opacity: 0;}}
+
+.letter2  {
+  animation: lettertwo 1s infinite;
+}
+@keyframes lettertwo {85% {opacity: 0;}}
+
+.letter3  {
+  animation: letterthree 1s infinite;
+}
+@keyframes letterthree {90% {opacity: 0;}}
+
+.letter4  {
+  animation: letterfour 1s infinite;
+}
+@keyframes letterfour {95% {opacity: 0;}}
+
+.letter5  {
+  animation: letterfive 1s infinite;
+}
+@keyframes letterfive {100% {opacity: 0;}}

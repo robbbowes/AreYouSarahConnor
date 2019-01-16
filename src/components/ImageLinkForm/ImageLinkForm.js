@@ -1,7 +1,7 @@
 import React from 'react';
 import './ImageLinkForm.css';
 
-const ImageLinkForm = ({ onInputChange, onButtonSubmit }) => {
+const ImageLinkForm = ({ onInputChange, onButtonSubmit, addTimeLimitedCSS }) => {
     return (
         <div>
             <div className='center'>
@@ -13,10 +13,15 @@ const ImageLinkForm = ({ onInputChange, onButtonSubmit }) => {
                         onChange={onInputChange} 
                     />
                     <button 
+                        id='submit-button'
                         className='w-30 fade f4 link pv dib white quantico bg-dark-red' 
                         onClick={onButtonSubmit}
                     >
-                        SCAN
+                        <span id='letter1' className='toggle'>S</span>
+                        <span id='letter2' className='toggle'>C</span>
+                        <span id='letter3' className='toggle'>A</span>
+                        <span id='letter4' className='toggle'>N</span>
+                        {/* <span id='letter5' className='letter5'>_</span> */}
                     </button>
                 </div>
             </div>
