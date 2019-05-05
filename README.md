@@ -5,6 +5,10 @@ I expanded upon this by using the celebrity face recognition model and add a Ter
 
 The face recognition functionality remains however users uploading a piture of a Linda Hamilton (Sarah Connor) in the Terminator 1 & 2 films will cause the mission status to change. 
 
+# How to use:
+
+* Paste an image url into the input click scan - the image will be scanned for faces, if Sarah Connor is located - the mission status will and CSS styling of the box will change
+
 # Current state:
 
 * The face recognition works correctly and draws a CSS-generated box around the face
